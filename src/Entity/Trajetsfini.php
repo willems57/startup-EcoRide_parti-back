@@ -62,6 +62,10 @@ class Trajetsfini
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $passager5 = null;
 
+    #[ORM\OneToOne(cascade: ['persist', 'remove'])]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Voiture $Voiture = null;
+
     public function getId(): ?int
     {
         return $this->id;
