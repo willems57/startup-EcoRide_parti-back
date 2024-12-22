@@ -7,6 +7,7 @@ use App\Entity\Trajets;
 use App\Repository\TrajetsRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use OpenApi\Annotations as OA;
+use DateTimeImmutable;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\{JsonResponse, Request, Response};
 //use Symfony\Component\Routing\Annotation\Route;
@@ -36,38 +37,78 @@ class TrajetsController extends AbstractController
      *         description="Données du trajets créer",
      *         @OA\JsonContent(
      *             type="object",
-     *             @OA\Property(property="name", type="string", example="Votre nom"),
-     *             @OA\Property(property="mail", type="string", example="Email du l'avis"),
+     *             @OA\Property(property="Nom", type="string", example="Votre nom"),
+     *             @OA\Property(property="Prenom", type="string", example="Votre prenom"),
+     *             @OA\Property(property="voiture", type="string", example="Votre Imatriculation"),
      *             @OA\Property(property="date", type="DateTime", format="date-time"),
-     *             @OA\Property(property="message", type="text", example="Votre message")
+     *             @OA\Property(property="depart", type="string", example="depart?"),
+     *             @OA\Property(property="arriver", type="string", example="arriver?"),
+     *             @OA\Property(property="duree", type="string", example="duree?"),
+     *             @OA\Property(property="fumeur", type="string", example="fumeur?"),
+     *             @OA\Property(property="annimaux", type="string", example="annimaux?"),
+     *             @OA\Property(property="marque", type="string", example="marque?"),
+     *             @OA\Property(property="place", type="integer", example="place?"),
+     *             @OA\Property(property="modele", type="string", example="modele?"),
+     *             @OA\Property(property="couleur", type="string", example="couleur?"),
+     *             @OA\Property(property="image", type="string", example="image?"),
+     *             @OA\Property(property="passager1", type="string", example="passager1?"),
+     *             @OA\Property(property="EmailInput1", type="string", example="EmailInput1?"),
+     *             @OA\Property(property="passager2", type="string", example="passager2?"),
+     *             @OA\Property(property="EmailInput2", type="string", example="EmailInput2?"),
+     *             @OA\Property(property="passager3", type="string", example="passager3?"),
+     *             @OA\Property(property="EmailInput3", type="string", example="EmailInput3?"),
+     *             @OA\Property(property="passager4", type="string", example="passager4?"),
+     *             @OA\Property(property="EmailInput4", type="string", example="EmailInput4?"),
+     *             @OA\Property(property="passager5", type="string", example="passager5?"),
+     *             @OA\Property(property="EmailInput5", type="string", example="EmailInput5?")
      *         )
      *     ),
      *     @OA\Response(
      *         response=201,
-     *         description="Contact créé avec succès",
+     *         description="Trajets créé avec succès",
      *         @OA\JsonContent(
      *             type="object",
      *             @OA\Property(property="id", type="integer", example=1),
-     *             @OA\Property(property="name", type="string", example="Votre nom"),
-     *             @OA\Property(property="mail", type="string", example="Email du l'avis"),
+     *             @OA\Property(property="Nom", type="string", example="Votre nom"),
+     *             @OA\Property(property="Prenom", type="string", example="Votre prenom"),
+     *             @OA\Property(property="voiture", type="string", example="Votre Imatriculation"),
      *             @OA\Property(property="date", type="DateTime", format="date-time"),
-     *             @OA\Property(property="message", type="text", example="Votre message")
+     *             @OA\Property(property="depart", type="string", example="depart?"),
+     *             @OA\Property(property="arriver", type="string", example="arriver?"),
+     *             @OA\Property(property="duree", type="string", example="duree?"),
+     *             @OA\Property(property="fumeur", type="string", example="fumeur?"),
+     *             @OA\Property(property="annimaux", type="string", example="annimaux?"),
+     *             @OA\Property(property="marque", type="string", example="marque?"),
+     *             @OA\Property(property="place", type="integer", example="place?"),
+     *             @OA\Property(property="modele", type="string", example="modele?"),
+     *             @OA\Property(property="couleur", type="string", example="couleur?"),
+     *             @OA\Property(property="image", type="string", example="image?"),
+     *             @OA\Property(property="passager1", type="string", example="passager1?"),
+     *             @OA\Property(property="EmailInput1", type="string", example="EmailInput1?"),
+     *             @OA\Property(property="passager2", type="string", example="passager2?"),
+     *             @OA\Property(property="EmailInput2", type="string", example="EmailInput2?"),
+     *             @OA\Property(property="passager3", type="string", example="passager3?"),
+     *             @OA\Property(property="EmailInput3", type="string", example="EmailInput3?"),
+     *             @OA\Property(property="passager4", type="string", example="passager4?"),
+     *             @OA\Property(property="EmailInput4", type="string", example="EmailInput4?"),
+     *             @OA\Property(property="passager5", type="string", example="passager5?"),
+     *             @OA\Property(property="EmailInput5", type="string", example="EmailInput5?")
      *         )
      *     )
      * )
      */
     public function new(Request $request): JsonResponse
     {
-        $contact = $this->serializer->deserialize($request->getContent(), contact::class, 'json');
-        $contact->setCreatedAt(new DateTimeImmutable());
+        $trajets = $this->serializer->deserialize($request->getContent(), Trajets::class, 'json');
+        $trajets->setCreatedAt(new DateTimeImmutable());
 
-        $this->manager->persist($contact);
+        $this->manager->persist($trajets);
         $this->manager->flush();
 
-        $responseData = $this->serializer->serialize($contact, 'json');
+        $responseData = $this->serializer->serialize($trajets, 'json');
         $location = $this->urlGenerator->generate(
-            'app_api_contact_show',
-            ['id' => $contact->getId()],
+            'app_api_trajets_show',
+            ['id' => $trajets->getId()],
             UrlGeneratorInterface::ABSOLUTE_URL,
         );
 
@@ -75,39 +116,58 @@ class TrajetsController extends AbstractController
     }
 
     /** @OA\Get(
-     *     path="/api/contact/{id}",
-     *     summary="Afficher un contact par ID",
+     *     path="/api/trajets/{id}",
+     *     summary="Afficher un trajets par ID",
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
      *         required=true,
-     *         description="ID du contact à afficher",
+     *         description="ID du trajets à afficher",
      *         @OA\Schema(type="integer")
      *     ),
      *     @OA\Response(
      *         response=200,
-     *         description="Contact trouvé avec succès",
+     *         description="Trajets trouvé avec succès",
      *         @OA\JsonContent(
      *             type="object",
-     *             @OA\Property(property="id", type="integer", example=1),
-     *             @OA\Property(property="name", type="string", example="Votre nom"),
-     *             @OA\Property(property="mail", type="string", example="Email du l'avis"),
+     *             @OA\Property(property="Nom", type="string", example="Votre nom"),
+     *             @OA\Property(property="Prenom", type="string", example="Votre prenom"),
+     *             @OA\Property(property="voiture", type="string", example="Votre Imatriculation"),
      *             @OA\Property(property="date", type="DateTime", format="date-time"),
-     *             @OA\Property(property="message", type="text", example="Votre message")
+     *             @OA\Property(property="depart", type="string", example="depart?"),
+     *             @OA\Property(property="arriver", type="string", example="arriver?"),
+     *             @OA\Property(property="duree", type="string", example="duree?"),
+     *             @OA\Property(property="fumeur", type="string", example="fumeur?"),
+     *             @OA\Property(property="annimaux", type="string", example="annimaux?"),
+     *             @OA\Property(property="marque", type="string", example="marque?"),
+     *             @OA\Property(property="place", type="integer", example="place?"),
+     *             @OA\Property(property="modele", type="string", example="modele?"),
+     *             @OA\Property(property="couleur", type="string", example="couleur?"),
+     *             @OA\Property(property="image", type="string", example="image?"),
+     *             @OA\Property(property="passager1", type="string", example="passager1?"),
+     *             @OA\Property(property="EmailInput1", type="string", example="EmailInput1?"),
+     *             @OA\Property(property="passager2", type="string", example="passager2?"),
+     *             @OA\Property(property="EmailInput2", type="string", example="EmailInput2?"),
+     *             @OA\Property(property="passager3", type="string", example="passager3?"),
+     *             @OA\Property(property="EmailInput3", type="string", example="EmailInput3?"),
+     *             @OA\Property(property="passager4", type="string", example="passager4?"),
+     *             @OA\Property(property="EmailInput4", type="string", example="EmailInput4?"),
+     *             @OA\Property(property="passager5", type="string", example="passager5?"),
+     *             @OA\Property(property="EmailInput5", type="string", example="EmailInput5?")
      *         )
      *     ),
      *     @OA\Response(
      *         response=404,
-     *         description="Contact non trouvé"
+     *         description="Trajets non trouvé"
      *     )
      * )
      */
     #[Route('/{id}', name: 'show', methods: 'GET')]
     public function show(int $id): JsonResponse
     {
-        $contact = $this->repository->findOneBy(['id' => $id]);
-        if ($contact) {
-            $responseData = $this->serializer->serialize($contact, 'json');
+        $trajets = $this->repository->findOneBy(['id' => $id]);
+        if ($trajets) {
+            $responseData = $this->serializer->serialize($trajets, 'json');
 
             return new JsonResponse($responseData, Response::HTTP_OK, [], true);
         }
@@ -119,48 +179,68 @@ class TrajetsController extends AbstractController
 
     
     /** @OA\Put(
-     *     path="/api/contact/{id}",
-     *     summary="Modifier un avis par ID",
+     *     path="/api/trajets/{id}",
+     *     summary="Modifier un trajets par ID",
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
      *         required=true,
-     *         description="ID du contact à modifier",
+     *         description="ID du trajets à modifier",
      *         @OA\Schema(type="integer")
      *     ),
      *     @OA\RequestBody(
      *         required=true,
-     *         description="Nouvelles données du contact à mettre à jour",
+     *         description="Nouvelles données du trajets à mettre à jour",
      *         @OA\JsonContent(
      *             type="object",
-     *             @OA\Property(property="name", type="string", example="Votre nom"),
-     *             @OA\Property(property="mail", type="string", example="Email du l'avis"),
+     *             @OA\Property(property="Nom", type="string", example="Votre nom"),
+     *             @OA\Property(property="Prenom", type="string", example="Votre prenom"),
+     *             @OA\Property(property="voiture", type="string", example="Votre Imatriculation"),
      *             @OA\Property(property="date", type="DateTime", format="date-time"),
-     *             @OA\Property(property="message", type="text", example="Votre message")
+     *             @OA\Property(property="depart", type="string", example="depart?"),
+     *             @OA\Property(property="arriver", type="string", example="arriver?"),
+     *             @OA\Property(property="duree", type="string", example="duree?"),
+     *             @OA\Property(property="fumeur", type="string", example="fumeur?"),
+     *             @OA\Property(property="annimaux", type="string", example="annimaux?"),
+     *             @OA\Property(property="marque", type="string", example="marque?"),
+     *             @OA\Property(property="place", type="integer", example="place?"),
+     *             @OA\Property(property="modele", type="string", example="modele?"),
+     *             @OA\Property(property="couleur", type="string", example="couleur?"),
+     *             @OA\Property(property="image", type="string", example="image?"),
+     *             @OA\Property(property="passager1", type="string", example="passager1?"),
+     *             @OA\Property(property="EmailInput1", type="string", example="EmailInput1?"),
+     *             @OA\Property(property="passager2", type="string", example="passager2?"),
+     *             @OA\Property(property="EmailInput2", type="string", example="EmailInput2?"),
+     *             @OA\Property(property="passager3", type="string", example="passager3?"),
+     *             @OA\Property(property="EmailInput3", type="string", example="EmailInput3?"),
+     *             @OA\Property(property="passager4", type="string", example="passager4?"),
+     *             @OA\Property(property="EmailInput4", type="string", example="EmailInput4?"),
+     *             @OA\Property(property="passager5", type="string", example="passager5?"),
+     *             @OA\Property(property="EmailInput5", type="string", example="EmailInput5?")
      *         )
      *     ),
      *     @OA\Response(
      *         response=204,
-     *         description="Contact modifié avec succès"
+     *         description="Trajets modifié avec succès"
      *     ),
      *     @OA\Response(
      *         response=404,
-     *         description="Contact non trouvé"
+     *         description="Trajets non trouvé"
      *     )
      * )
      */
     #[Route('/{id}', name: 'edit', methods: 'PUT')]
     public function edit(int $id, Request $request): JsonResponse
     {
-        $contact = $this->repository->findOneBy(['id' => $id]);
-        if ($contact) {
-            $contact = $this->serializer->deserialize(
+        $trajets = $this->repository->findOneBy(['id' => $id]);
+        if ($trajets) {
+            $trajets = $this->serializer->deserialize(
                 $request->getContent(),
-                Contact::class,
+                Trajets::class,
                 'json',
-                [AbstractNormalizer::OBJECT_TO_POPULATE => $contact]
+                [AbstractNormalizer::OBJECT_TO_POPULATE => $trajets]
             );
-            $contact->setUpdatedAt(new DateTimeImmutable());
+            $trajets->setUpdatedAt(new DateTimeImmutable());
 
             $this->manager->flush();
 
@@ -172,31 +252,31 @@ class TrajetsController extends AbstractController
 
 
     /** @OA\Delete(
-     *     path="/api/contact/{id}",
-     *     summary="Supprimer un contact par ID",
+     *     path="/api/trajets/{id}",
+     *     summary="Supprimer un trajets par ID",
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
      *         required=true,
-     *         description="ID du contact à supprimer",
+     *         description="ID du trajets à supprimer",
      *         @OA\Schema(type="integer")
      *     ),
      *     @OA\Response(
      *         response=204,
-     *         description="contact supprimé avec succès"
+     *         description="trajets supprimé avec succès"
      *     ),
      *     @OA\Response(
      *         response=404,
-     *         description="Contact non trouvé"
+     *         description="trajets non trouvé"
      *     )
      * )
      */
     #[Route('/{id}', name: 'delete', methods: 'DELETE')]
     public function delete(int $id): JsonResponse
     {
-        $contact = $this->repository->findOneBy(['id' => $id]);
-        if ($contact) {
-            $this->manager->remove($contact);
+        $trajets = $this->repository->findOneBy(['id' => $id]);
+        if ($trajets) {
+            $this->manager->remove($trajets);
             $this->manager->flush();
 
             return new JsonResponse(null, Response::HTTP_NO_CONTENT);
