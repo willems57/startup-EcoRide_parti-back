@@ -2,8 +2,8 @@
 
 namespace App\Controller;
 
-use App\Entity\Avis;
-use App\Repository\AvisRepository;
+use App\Entity\Contact;
+use App\Repository\ContactRepository;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use OpenApi\Annotations as OA;
@@ -15,12 +15,13 @@ use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Routing\Attribute\Route;
 
-#[Route('/api/Avis', name: 'app_api_avis_')]
-class AvisController extends AbstractController
+
+#[Route('/api/Contact', name: 'app_api_contact_')]
+class ContactController extends AbstractController
 {
     public function __construct(
         private EntityManagerInterface $manager,
-        private AvisRepository $repository,
+        private ContactRepository $repository,
         private SerializerInterface $serializer,
         private UrlGeneratorInterface $urlGenerator,
     ) {
@@ -28,45 +29,45 @@ class AvisController extends AbstractController
 
     #[Route(methods: 'POST')]
     /** @OA\Post(
-     *     path="/api/avis",
-     *     summary="Créer un avis",
+     *     path="/api/contact",
+     *     summary="Créer un contact",
      *     @OA\RequestBody(
      *         required=true,
-     *         description="Données de l'avis à créer",
+     *         description="Données du contact créer",
      *         @OA\JsonContent(
      *             type="object",
      *             @OA\Property(property="name", type="string", example="Votre nom"),
-     *             @OA\Property(property="commentaire", type="text", example="Description de l'avis"),
+     *             @OA\Property(property="mail", type="string", example="Email du l'avis"),
      *             @OA\Property(property="date", type="DateTime", format="date-time"),
-     *             @OA\Property(property="Conducteur", type="string", example="Nom du conducteur")
+     *             @OA\Property(property="message", type="text", example="Votre message")
      *         )
      *     ),
      *     @OA\Response(
      *         response=201,
-     *         description="Avis créé avec succès",
+     *         description="Contact créé avec succès",
      *         @OA\JsonContent(
      *             type="object",
      *             @OA\Property(property="id", type="integer", example=1),
      *             @OA\Property(property="name", type="string", example="Votre nom"),
-     *             @OA\Property(property="commentaire", type="text", example="Description de l'avis"),
+     *             @OA\Property(property="mail", type="string", example="Email du l'avis"),
      *             @OA\Property(property="date", type="DateTime", format="date-time"),
-     *             @OA\Property(property="Conducteur", type="string", example="Nom du conducteur")
+     *             @OA\Property(property="message", type="text", example="Votre message")
      *         )
      *     )
      * )
      */
     public function new(Request $request): JsonResponse
     {
-        $avis = $this->serializer->deserialize($request->getContent(), Avis::class, 'json');
-        $avis->setCreatedAt(new DateTimeImmutable());
+        $contact = $this->serializer->deserialize($request->getContent(), contact::class, 'json');
+        $contact->setCreatedAt(new DateTimeImmutable());
 
-        $this->manager->persist($avis);
+        $this->manager->persist($contact);
         $this->manager->flush();
 
-        $responseData = $this->serializer->serialize($avis, 'json');
+        $responseData = $this->serializer->serialize($contact, 'json');
         $location = $this->urlGenerator->generate(
-            'app_api_avis_show',
-            ['id' => $avis->getId()],
+            'app_api_contact_show',
+            ['id' => $contact->getId()],
             UrlGeneratorInterface::ABSOLUTE_URL,
         );
 
@@ -74,39 +75,39 @@ class AvisController extends AbstractController
     }
 
     /** @OA\Get(
-     *     path="/api/avis/{id}",
-     *     summary="Afficher un avis par ID",
+     *     path="/api/contact/{id}",
+     *     summary="Afficher un contact par ID",
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
      *         required=true,
-     *         description="ID de l'avis à afficher",
+     *         description="ID du contact à afficher",
      *         @OA\Schema(type="integer")
      *     ),
      *     @OA\Response(
      *         response=200,
-     *         description="Avis trouvé avec succès",
+     *         description="Contact trouvé avec succès",
      *         @OA\JsonContent(
      *             type="object",
      *             @OA\Property(property="id", type="integer", example=1),
      *             @OA\Property(property="name", type="string", example="Votre nom"),
-     *             @OA\Property(property="commentaire", type="text", example="Description de l'avis"),
+     *             @OA\Property(property="mail", type="string", example="Email du l'avis"),
      *             @OA\Property(property="date", type="DateTime", format="date-time"),
-     *             @OA\Property(property="Conducteur", type="string", example="Nom du conducteur")
+     *             @OA\Property(property="message", type="text", example="Votre message")
      *         )
      *     ),
      *     @OA\Response(
      *         response=404,
-     *         description="Avis non trouvé"
+     *         description="Contact non trouvé"
      *     )
      * )
      */
     #[Route('/{id}', name: 'show', methods: 'GET')]
     public function show(int $id): JsonResponse
     {
-        $avis = $this->repository->findOneBy(['id' => $id]);
-        if ($avis) {
-            $responseData = $this->serializer->serialize($avis, 'json');
+        $contact = $this->repository->findOneBy(['id' => $id]);
+        if ($contact) {
+            $responseData = $this->serializer->serialize($contact, 'json');
 
             return new JsonResponse($responseData, Response::HTTP_OK, [], true);
         }
@@ -118,47 +119,48 @@ class AvisController extends AbstractController
 
     
     /** @OA\Put(
-     *     path="/api/avis/{id}",
+     *     path="/api/contact/{id}",
      *     summary="Modifier un avis par ID",
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
      *         required=true,
-     *         description="ID de l'avis à modifier",
+     *         description="ID du contact à modifier",
      *         @OA\Schema(type="integer")
      *     ),
      *     @OA\RequestBody(
      *         required=true,
-     *         description="Nouvelles données de l'avis à mettre à jour",
+     *         description="Nouvelles données du contact à mettre à jour",
      *         @OA\JsonContent(
      *             type="object",
-     *             @OA\Property(property="name", type="string", example="Nouveau no de l'avis"),
-     *             @OA\Property(property="commentaire", type="text", example="Nouveaux commentaire de l'avis"),
-     *             @OA\Property(property="Conducteur", type="string", example="nouveau nom du conducteur")
+     *             @OA\Property(property="name", type="string", example="Votre nom"),
+     *             @OA\Property(property="mail", type="string", example="Email du l'avis"),
+     *             @OA\Property(property="date", type="DateTime", format="date-time"),
+     *             @OA\Property(property="message", type="text", example="Votre message")
      *         )
      *     ),
      *     @OA\Response(
      *         response=204,
-     *         description="Avis modifié avec succès"
+     *         description="Contact modifié avec succès"
      *     ),
      *     @OA\Response(
      *         response=404,
-     *         description="Avis non trouvé"
+     *         description="Contact non trouvé"
      *     )
      * )
      */
     #[Route('/{id}', name: 'edit', methods: 'PUT')]
     public function edit(int $id, Request $request): JsonResponse
     {
-        $avis = $this->repository->findOneBy(['id' => $id]);
-        if ($avis) {
-            $avis = $this->serializer->deserialize(
+        $contact = $this->repository->findOneBy(['id' => $id]);
+        if ($contact) {
+            $contact = $this->serializer->deserialize(
                 $request->getContent(),
-                Avis::class,
+                Contact::class,
                 'json',
-                [AbstractNormalizer::OBJECT_TO_POPULATE => $avis]
+                [AbstractNormalizer::OBJECT_TO_POPULATE => $contact]
             );
-            $avis->setUpdatedAt(new DateTimeImmutable());
+            $contact->setUpdatedAt(new DateTimeImmutable());
 
             $this->manager->flush();
 
@@ -170,31 +172,31 @@ class AvisController extends AbstractController
 
 
     /** @OA\Delete(
-     *     path="/api/avis/{id}",
-     *     summary="Supprimer un avis par ID",
+     *     path="/api/contact/{id}",
+     *     summary="Supprimer un contact par ID",
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
      *         required=true,
-     *         description="ID du avis à supprimer",
+     *         description="ID du contact à supprimer",
      *         @OA\Schema(type="integer")
      *     ),
      *     @OA\Response(
      *         response=204,
-     *         description="Avis supprimé avec succès"
+     *         description="contact supprimé avec succès"
      *     ),
      *     @OA\Response(
      *         response=404,
-     *         description="Avis non trouvé"
+     *         description="Contact non trouvé"
      *     )
      * )
      */
     #[Route('/{id}', name: 'delete', methods: 'DELETE')]
     public function delete(int $id): JsonResponse
     {
-        $avis = $this->repository->findOneBy(['id' => $id]);
-        if ($avis) {
-            $this->manager->remove($avis);
+        $contact = $this->repository->findOneBy(['id' => $id]);
+        if ($contact) {
+            $this->manager->remove($contact);
             $this->manager->flush();
 
             return new JsonResponse(null, Response::HTTP_NO_CONTENT);

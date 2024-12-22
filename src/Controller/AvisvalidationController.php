@@ -2,25 +2,25 @@
 
 namespace App\Controller;
 
-use App\Entity\Avis;
-use App\Repository\AvisRepository;
+use App\Entity\Avisvalidation;
+use App\Repository\AvisvalidationRepository;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use OpenApi\Annotations as OA;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\{JsonResponse, Request, Response};
-//use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\SerializerInterface;
-use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
-#[Route('/api/Avis', name: 'app_api_avis_')]
-class AvisController extends AbstractController
+
+#[Route('/api/Avisvalidation', name: 'app_api_avisvalidation_')]
+class AvisvalidationController extends AbstractController
 {
     public function __construct(
         private EntityManagerInterface $manager,
-        private AvisRepository $repository,
+        private AvisvalidationRepository $repository,
         private SerializerInterface $serializer,
         private UrlGeneratorInterface $urlGenerator,
     ) {
@@ -28,15 +28,15 @@ class AvisController extends AbstractController
 
     #[Route(methods: 'POST')]
     /** @OA\Post(
-     *     path="/api/avis",
-     *     summary="Créer un avis",
+     *     path="/api/avisvalidation",
+     *     summary="Créer un avisvalidation",
      *     @OA\RequestBody(
      *         required=true,
-     *         description="Données de l'avis à créer",
+     *         description="Données de l'avisvalidation à créer",
      *         @OA\JsonContent(
      *             type="object",
      *             @OA\Property(property="name", type="string", example="Votre nom"),
-     *             @OA\Property(property="commentaire", type="text", example="Description de l'avis"),
+     *             @OA\Property(property="commentaire", type="string", example="Description de l'avis"),
      *             @OA\Property(property="date", type="DateTime", format="date-time"),
      *             @OA\Property(property="Conducteur", type="string", example="Nom du conducteur")
      *         )
@@ -48,7 +48,7 @@ class AvisController extends AbstractController
      *             type="object",
      *             @OA\Property(property="id", type="integer", example=1),
      *             @OA\Property(property="name", type="string", example="Votre nom"),
-     *             @OA\Property(property="commentaire", type="text", example="Description de l'avis"),
+     *             @OA\Property(property="commentaire", type="string", example="Description de l'avis"),
      *             @OA\Property(property="date", type="DateTime", format="date-time"),
      *             @OA\Property(property="Conducteur", type="string", example="Nom du conducteur")
      *         )
@@ -57,16 +57,16 @@ class AvisController extends AbstractController
      */
     public function new(Request $request): JsonResponse
     {
-        $avis = $this->serializer->deserialize($request->getContent(), Avis::class, 'json');
-        $avis->setCreatedAt(new DateTimeImmutable());
+        $avisvalidation = $this->serializer->deserialize($request->getContent(), Avisvalidation::class, 'json');
+        $avisvalidation->setCreatedAt(new DateTimeImmutable());
 
-        $this->manager->persist($avis);
+        $this->manager->persist($avisvalidation);
         $this->manager->flush();
 
-        $responseData = $this->serializer->serialize($avis, 'json');
+        $responseData = $this->serializer->serialize($avisvalidation, 'json');
         $location = $this->urlGenerator->generate(
             'app_api_avis_show',
-            ['id' => $avis->getId()],
+            ['id' => $avisvalidation->getId()],
             UrlGeneratorInterface::ABSOLUTE_URL,
         );
 
@@ -90,7 +90,7 @@ class AvisController extends AbstractController
      *             type="object",
      *             @OA\Property(property="id", type="integer", example=1),
      *             @OA\Property(property="name", type="string", example="Votre nom"),
-     *             @OA\Property(property="commentaire", type="text", example="Description de l'avis"),
+     *             @OA\Property(property="commentaire", type="string", example="Description de l'avis"),
      *             @OA\Property(property="date", type="DateTime", format="date-time"),
      *             @OA\Property(property="Conducteur", type="string", example="Nom du conducteur")
      *         )
@@ -104,9 +104,9 @@ class AvisController extends AbstractController
     #[Route('/{id}', name: 'show', methods: 'GET')]
     public function show(int $id): JsonResponse
     {
-        $avis = $this->repository->findOneBy(['id' => $id]);
-        if ($avis) {
-            $responseData = $this->serializer->serialize($avis, 'json');
+        $avisvalidation = $this->repository->findOneBy(['id' => $id]);
+        if ($avisvalidation) {
+            $responseData = $this->serializer->serialize($avisvalidation, 'json');
 
             return new JsonResponse($responseData, Response::HTTP_OK, [], true);
         }
@@ -133,7 +133,7 @@ class AvisController extends AbstractController
      *         @OA\JsonContent(
      *             type="object",
      *             @OA\Property(property="name", type="string", example="Nouveau no de l'avis"),
-     *             @OA\Property(property="commentaire", type="text", example="Nouveaux commentaire de l'avis"),
+     *             @OA\Property(property="commentaire", type="string", example="Nouveaux commentaire de l'avis"),
      *             @OA\Property(property="Conducteur", type="string", example="nouveau nom du conducteur")
      *         )
      *     ),
@@ -150,15 +150,15 @@ class AvisController extends AbstractController
     #[Route('/{id}', name: 'edit', methods: 'PUT')]
     public function edit(int $id, Request $request): JsonResponse
     {
-        $avis = $this->repository->findOneBy(['id' => $id]);
-        if ($avis) {
-            $avis = $this->serializer->deserialize(
+        $avisvalidation = $this->repository->findOneBy(['id' => $id]);
+        if ($avisvalidation) {
+            $avisvalidation = $this->serializer->deserialize(
                 $request->getContent(),
-                Avis::class,
+                Avisvalidation::class,
                 'json',
-                [AbstractNormalizer::OBJECT_TO_POPULATE => $avis]
+                [AbstractNormalizer::OBJECT_TO_POPULATE => $avisvalidation]
             );
-            $avis->setUpdatedAt(new DateTimeImmutable());
+            $avisvalidation->setUpdatedAt(new DateTimeImmutable());
 
             $this->manager->flush();
 
@@ -192,9 +192,9 @@ class AvisController extends AbstractController
     #[Route('/{id}', name: 'delete', methods: 'DELETE')]
     public function delete(int $id): JsonResponse
     {
-        $avis = $this->repository->findOneBy(['id' => $id]);
-        if ($avis) {
-            $this->manager->remove($avis);
+        $avisvalidation = $this->repository->findOneBy(['id' => $id]);
+        if ($avisvalidation) {
+            $this->manager->remove($avisvalidation);
             $this->manager->flush();
 
             return new JsonResponse(null, Response::HTTP_NO_CONTENT);
