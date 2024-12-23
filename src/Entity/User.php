@@ -48,6 +48,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->apiToken = bin2hex(random_bytes(20));
         $this->voitures = new ArrayCollection();
         $this->avis = new ArrayCollection();
+        $this->trajetsfinis = new ArrayCollection();
     }
 
     #[ORM\OneToOne(inversedBy: 'user', cascade: ['persist', 'remove'])]
@@ -86,6 +87,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     #[ORM\OneToMany(targetEntity: Avis::class, mappedBy: 'User', orphanRemoval: true)]
     private Collection $avis;
+
+    /**
+     * @var Collection<int, Trajetsfini>
+     */
+    #[ORM\ManyToMany(targetEntity: Trajetsfini::class, mappedBy: 'User')]
+    private Collection $trajetsfinis;
 
 
     public function getId(): ?int
@@ -341,6 +348,33 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             if ($avi->getUser() === $this) {
                 $avi->setUser(null);
             }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Trajetsfini>
+     */
+    public function getTrajetsfinis(): Collection
+    {
+        return $this->trajetsfinis;
+    }
+
+    public function addTrajetsfini(Trajetsfini $trajetsfini): static
+    {
+        if (!$this->trajetsfinis->contains($trajetsfini)) {
+            $this->trajetsfinis->add($trajetsfini);
+            $trajetsfini->addUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeTrajetsfini(Trajetsfini $trajetsfini): static
+    {
+        if ($this->trajetsfinis->removeElement($trajetsfini)) {
+            $trajetsfini->removeUser($this);
         }
 
         return $this;

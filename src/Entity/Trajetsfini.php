@@ -74,9 +74,16 @@ class Trajetsfini
     #[ORM\OneToMany(targetEntity: User::class, mappedBy: 'Trajetsfini')]
     private Collection $users;
 
+    /**
+     * @var Collection<int, User>
+     */
+    #[ORM\ManyToMany(targetEntity: User::class, inversedBy: 'trajetsfinis')]
+    private Collection $User;
+
     public function __construct()
     {
         $this->users = new ArrayCollection();
+        $this->User = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -304,5 +311,13 @@ class Trajetsfini
         }
 
         return $this;
+    }
+
+    /**
+     * @return Collection<int, User>
+     */
+    public function getUser(): Collection
+    {
+        return $this->User;
     }
 }
