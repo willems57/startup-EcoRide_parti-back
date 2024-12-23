@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -30,6 +32,54 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     #[ORM\Column]
     private ?string $password = null;
+
+    #[ORM\Column]
+    private ?\DateTimeImmutable $createdAt = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?\DateTimeImmutable $updatedAt = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $apiToken;
+
+    /** @throws \Exception */
+    public function __construct()
+    {
+        $this->apiToken = bin2hex(random_bytes(20));
+        $this->voitures = new ArrayCollection();
+    }
+
+    #[ORM\OneToOne(inversedBy: 'user', cascade: ['persist', 'remove'])]
+    private ?Credits $credits = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $firstName = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $lastName = null;
+
+    #[ORM\ManyToOne(inversedBy: 'users')]
+    private ?Trajets $Trajets = null;
+
+    #[ORM\ManyToOne(inversedBy: 'users')]
+    private ?Trajetsedit $Tajetsedit = null;
+
+    #[ORM\ManyToOne(inversedBy: 'users')]
+    private ?Trajetsfini $Trajetsfini = null;
+
+    #[ORM\OneToOne(cascade: ['persist', 'remove'])]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Avis $Avis = null;
+
+    /**
+     * @var Collection<int, Voiture>
+     */
+    #[ORM\OneToMany(targetEntity: Voiture::class, mappedBy: 'User')]
+    private Collection $voitures;
+
+    #[ORM\OneToOne(cascade: ['persist', 'remove'])]
+    private ?Avisvalidation $Avisvalidation = null;
+
 
     public function getId(): ?int
     {
@@ -103,5 +153,167 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         // If you store any temporary, sensitive data on the user, clear it here
         // $this->plainPassword = null;
+    }
+
+    public function getCreatedAt(): ?\DateTimeImmutable
+    {
+        return $this->createdAt;
+    }
+
+    public function setCreatedAt(\DateTimeImmutable $createdAt): static
+    {
+        $this->createdAt = $createdAt;
+
+        return $this;
+    }
+
+    public function getUpdatedAt(): ?\DateTimeImmutable
+    {
+        return $this->updatedAt;
+    }
+
+    public function setUpdatedAt(?\DateTimeImmutable $updatedAt): static
+    {
+        $this->updatedAt = $updatedAt;
+
+        return $this;
+    }
+
+    public function getApiToken(): ?string
+    {
+        return $this->apiToken;
+    }
+
+    public function setApiToken(string $apiToken): static
+    {
+        $this->apiToken = $apiToken;
+
+        return $this;
+    }
+
+    public function getCredits(): ?Credits
+    {
+        return $this->credits;
+    }
+
+    public function setCredits(?Credits $credits): static
+    {
+        $this->credits = $credits;
+
+        return $this;
+    }
+
+    public function getFirstName(): ?string
+    {
+        return $this->firstName;
+    }
+
+    public function setFirstName(string $firstName): static
+    {
+        $this->firstName = $firstName;
+
+        return $this;
+    }
+
+    public function getLastName(): ?string
+    {
+        return $this->lastName;
+    }
+
+    public function setLastName(string $lastName): static
+    {
+        $this->lastName = $lastName;
+
+        return $this;
+    }
+
+    public function getTrajets(): ?Trajets
+    {
+        return $this->Trajets;
+    }
+
+    public function setTrajets(?Trajets $Trajets): static
+    {
+        $this->Trajets = $Trajets;
+
+        return $this;
+    }
+
+    public function getTajetsedit(): ?Trajetsedit
+    {
+        return $this->Tajetsedit;
+    }
+
+    public function setTajetsedit(?Trajetsedit $Tajetsedit): static
+    {
+        $this->Tajetsedit = $Tajetsedit;
+
+        return $this;
+    }
+
+    public function getTrajetsfini(): ?Trajetsfini
+    {
+        return $this->Trajetsfini;
+    }
+
+    public function setTrajetsfini(?Trajetsfini $Trajetsfini): static
+    {
+        $this->Trajetsfini = $Trajetsfini;
+
+        return $this;
+    }
+
+    public function getAvis(): ?Avis
+    {
+        return $this->Avis;
+    }
+
+    public function setAvis(Avis $Avis): static
+    {
+        $this->Avis = $Avis;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Voiture>
+     */
+    public function getVoitures(): Collection
+    {
+        return $this->voitures;
+    }
+
+    public function addVoiture(Voiture $voiture): static
+    {
+        if (!$this->voitures->contains($voiture)) {
+            $this->voitures->add($voiture);
+            $voiture->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeVoiture(Voiture $voiture): static
+    {
+        if ($this->voitures->removeElement($voiture)) {
+            // set the owning side to null (unless already changed)
+            if ($voiture->getUser() === $this) {
+                $voiture->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getAvisvalidation(): ?Avisvalidation
+    {
+        return $this->Avisvalidation;
+    }
+
+    public function setAvisvalidation(?Avisvalidation $Avisvalidation): static
+    {
+        $this->Avisvalidation = $Avisvalidation;
+
+        return $this;
     }
 }
