@@ -47,6 +47,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         $this->apiToken = bin2hex(random_bytes(20));
         $this->voitures = new ArrayCollection();
+        $this->avis = new ArrayCollection();
     }
 
     #[ORM\OneToOne(inversedBy: 'user', cascade: ['persist', 'remove'])]
@@ -79,6 +80,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\OneToOne(cascade: ['persist', 'remove'])]
     private ?Avisvalidation $Avisvalidation = null;
+
+    /**
+     * @var Collection<int, Avis>
+     */
+    #[ORM\OneToMany(targetEntity: Avis::class, mappedBy: 'User', orphanRemoval: true)]
+    private Collection $avis;
 
 
     public function getId(): ?int
@@ -313,6 +320,28 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setAvisvalidation(?Avisvalidation $Avisvalidation): static
     {
         $this->Avisvalidation = $Avisvalidation;
+
+        return $this;
+    }
+
+    public function addAvi(Avis $avi): static
+    {
+        if (!$this->avis->contains($avi)) {
+            $this->avis->add($avi);
+            $avi->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeAvi(Avis $avi): static
+    {
+        if ($this->avis->removeElement($avi)) {
+            // set the owning side to null (unless already changed)
+            if ($avi->getUser() === $this) {
+                $avi->setUser(null);
+            }
+        }
 
         return $this;
     }

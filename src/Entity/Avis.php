@@ -26,6 +26,10 @@ class Avis
     #[ORM\Column(length: 255)]
     private ?string $Conducteur = null;
 
+    #[ORM\ManyToOne(inversedBy: 'avis')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?User $User = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -75,6 +79,18 @@ class Avis
     public function setConducteur(string $Conducteur): static
     {
         $this->Conducteur = $Conducteur;
+
+        return $this;
+    }
+
+    public function getUser(): ?User
+    {
+        return $this->User;
+    }
+
+    public function setUser(?User $User): static
+    {
+        $this->User = $User;
 
         return $this;
     }
