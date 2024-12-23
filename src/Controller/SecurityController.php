@@ -39,6 +39,7 @@ class SecurityController extends AbstractController
      *             @OA\Property(property="firstName", type="string", example="Thomas"),
      *             @OA\Property(property="lastName", type="string", example="Dupont"),
      *             @OA\Property(property="role", type="string", example="admin"),
+     *             @OA\Property(property="credits", type="integer", example="20"),
      *             @OA\Property(property="email", type="string", example="thomas@email.com"),
      *             @OA\Property(property="password", type="string", example="Mot de passe")
      *         )
